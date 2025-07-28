@@ -1,9 +1,15 @@
 import os
+import shutil
+import glob
+
 import cv2
-import tensorflow as tf
 import numpy as np
 from tensorflow.keras import utils
+from sklearn.model_selection import train_test_split
+
 from src.config import image_classes
+from src.config import train_dir
+
 
 
 def count_images_in_subfolders(base_folder):
@@ -75,6 +81,44 @@ def load_and_preprocess_data(data_dir, img_size, color_mode='grayscale'):
     labels = utils.to_categorical(labels, num_classes = num_classes)
 
     return images, labels
+
+def create_val_set(val_dir):
+  """
+    Splits files from the source training directory into a new, stratified
+    validation directory.
+  """
+  if os.path.exists(val_dir):
+    print("Validation directory already exists")
+    return
+
+  os.makedirs(val_dir)
+  print(f"Validation directory created at {val_dir}")
+
+  class_subfolders = [c for c in os.listdir(train_dir) if os.path.isdir(os.path.join(train_dir, c))]
+
+  for cls in class_subfolders:
+    src_class_path = os.path.join(train_dir, cls)
+    target_class_path = os.path.join(val_dir, cls)
+
+    os.makedirs(target_class_path)
+    print(f"Created directory: {target_class_path}")
+
+    image_files = glob.glob(os.path.join(src_class_path, '*.*'))
+    if not image_files:
+        print(f"Warning: No images found in {src_class_path}")
+        continue
+
+    train_files, val_files = train_test_split(
+        image_files,
+        test_size=0.2,
+        random_state=42
+    )
+
+    print(f"Moving {len(val_files)} files from '{cls}' class to validation set...")
+    for file_path in val_files:
+        shutil.move(file_path, target_class_path)
+
+  print("\nSuccessfully created and populated the stratified validation set.")
 
 if __name__ == "__main__":
     print("Data Preprocessing Utils")

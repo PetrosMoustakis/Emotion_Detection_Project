@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Emotion Detector CNN</h1>
+        <p>Upload an image of a face to detect the emotion.</p>
+        <div class="upload-area">
+            <input type="file" id="imageUpload" accept="image/*">
+            <label for="imageUpload">Choose an Image</label>
+        </div>
+        <div id="imagePreview"></div>
+        <button id="predictBtn" disabled>Predict</button>
+        <div id="loader" class="loader" style="display:none;"></div>
+        <div id="result"></div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
